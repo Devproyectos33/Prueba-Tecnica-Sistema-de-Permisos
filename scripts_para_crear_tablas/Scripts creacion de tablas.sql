@@ -394,7 +394,22 @@ SELECT * FROM PermiUserRecord
 
 	-----------------------------------  QUERYS  ----------------------------------------------------  
 
-exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 1
+exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 3  -- Ejecutivo Comercial con Privilegios
+exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 8  -- Ejecutivo Comercial con Privilegios
+exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 19 -- Ejecutivo Comercial con Privilegios
+exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 5  -- Asesor Comercial con privilegios
+exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 10 -- Asesor Comercial con privilegios
+exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 21 -- Asesor Comercial con privilegios
+exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 6  -- Cajero con privilegios
+exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 11 -- Cajero con privilegios
+exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 15 -- Cajero con privilegios
+
+exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 25 -- Asesor Comercial Supernumerario varias sucursales 
+exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 31 -- Cajero Supernumerario varias sucursales
+
+exec sp_ObtenerPermisosUsuarios @EntityId = 2, @UserId = 4 --  Auditores Centros de Costos
+exec sp_ObtenerPermisosUsuarios @EntityId = 2, @UserId = 9 --  Auditores Centros de Costos
+exec sp_ObtenerPermisosUsuarios @EntityId = 2, @UserId = 16 -- Auditores Centros de Costos
 
 SELECT * FROM [User] 
 SELECT * FROM [Role]
