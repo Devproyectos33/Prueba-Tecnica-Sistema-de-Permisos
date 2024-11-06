@@ -25,16 +25,22 @@ CREATE TABLE UserRole (
     FOREIGN KEY (RoleId) REFERENCES [Role](RoleId)
 );
 
-CREATE TABLE Entity (
+CREATE TABLE Sucursal (
     EntityId INT PRIMARY KEY,
-    EntityName VARCHAR(50) NOT NULL
+    EntityName VARCHAR(100)
 );
 
-CREATE TABLE Record (
+CREATE TABLE CentroCosto (
     RecordId INT PRIMARY KEY,
-    EntityId INT,                  
-    RecordName VARCHAR(50) NOT NULL,
-    FOREIGN KEY (EntityId) REFERENCES Entity(EntityId)
+    RecordName VARCHAR(100),
+);
+
+CREATE TABLE SucursalCentroCosto (
+    EntityId INT,
+    RecordId INT,
+    PRIMARY KEY (EntityId, RecordId),
+    FOREIGN KEY (EntityId) REFERENCES Sucursal(EntityId),
+    FOREIGN KEY (RecordId) REFERENCES CentroCosto(RecordId)
 );
 
 CREATE TABLE PermiUser (
@@ -60,8 +66,8 @@ CREATE TABLE PermiUserRecord (
     RecordId INT,            
     PermissionId INT         
 	FOREIGN KEY (UserId) REFERENCES [User](UserId),
-	FOREIGN KEY (EntityId) REFERENCES Entity(EntityId),
-	FOREIGN KEY (RecordId) REFERENCES Record(RecordId),
+	FOREIGN KEY (EntityId) REFERENCES Sucursal(EntityId)
+	FOREIGN KEY (RecordId) REFERENCES CentroCosto(RecordId)
 	FOREIGN KEY (PermissionId) REFERENCES Permission(PermissionId)
 );
 
@@ -72,8 +78,8 @@ CREATE TABLE PermiRoleRecord (
     RecordId INT,            
     PermissionId INT
 	FOREIGN KEY (RoleId) REFERENCES [Role](RoleId),
-	FOREIGN KEY (EntityId) REFERENCES Entity(EntityId),
-	FOREIGN KEY (RecordId) REFERENCES Record(RecordId),
+	FOREIGN KEY (EntityId) REFERENCES Sucursal(EntityId)
+	FOREIGN KEY (RecordId) REFERENCES CentroCosto(RecordId)
 	FOREIGN KEY (PermissionId) REFERENCES Permission(PermissionId)
 );
 
@@ -135,24 +141,34 @@ SELECT * FROM [Role]
 	INSERT INTO [Role] (RoleId, RoleName) VALUES (7, 'Auditor');
 
 
---- ENTIDAD
-SELECT * FROM Entity
+--- ENTIDAD SUCURSAL
+SELECT * FROM Sucursal
 
-	INSERT INTO Entity (EntityId, EntityName) VALUES (1, 'Sucursal');
-	INSERT INTO Entity (EntityId, EntityName) VALUES (2, 'Centro de Costos');
+	INSERT INTO Sucursal (EntityId, EntityName) VALUES (1, 'Sucursal Centro')
+	INSERT INTO Sucursal (EntityId, EntityName) VALUES (2, 'Sucursal Norte')
+	INSERT INTO Sucursal (EntityId, EntityName) VALUES (3, 'Sucursal Occidente')
 
 
--- DEALLE SUCURSAL Y/O CENTRO DE COSTO
-SELECT * FROM Record
+-- ENTIDAD CENTRO DE COSTO
+SELECT * FROM CentroCosto
 
-	-- Registros para Sucursal
-	INSERT INTO Record (RecordId, EntityId, RecordName) VALUES (101, 1, 'Sucursal Centro');
-	INSERT INTO Record (RecordId, EntityId, RecordName) VALUES (102, 1, 'Sucursal Norte');
-	INSERT INTO Record (RecordId, EntityId, RecordName) VALUES (103, 1, 'Sucursal Occidente');
-	-- Registros para Centros de Costos
-	INSERT INTO Record (RecordId, EntityId, RecordName) VALUES (201, 2, 'Centro de Costos Operativo');
-	INSERT INTO Record (RecordId, EntityId, RecordName) VALUES (202, 2, 'Centro de Costos Comercial');
-	INSERT INTO Record (RecordId, EntityId, RecordName) VALUES (203, 2, 'Centro de Costos Financiero');
+	INSERT INTO CentroCosto (RecordId, RecordName) VALUES (1, 'Centro de Costos Operativo')
+	INSERT INTO CentroCosto (RecordId, RecordName) VALUES (2, 'Centro de Costos Comercial')
+	INSERT INTO CentroCosto (RecordId, RecordName) VALUES (3, 'Centro de Costos Financiero')
+
+
+--  SUCURSAL Y CENTROS DE COSTOS
+SELECT * FROM SucursalCentroCosto
+
+	INSERT INTO SucursalCentroCosto (EntityId, RecordId) VALUES (1, 1)
+	INSERT INTO SucursalCentroCosto (EntityId, RecordId) VALUES (1, 2)
+	INSERT INTO SucursalCentroCosto (EntityId, RecordId) VALUES (1, 3)
+	INSERT INTO SucursalCentroCosto (EntityId, RecordId) VALUES (2, 1)
+	INSERT INTO SucursalCentroCosto (EntityId, RecordId) VALUES (2, 2)
+	INSERT INTO SucursalCentroCosto (EntityId, RecordId) VALUES (2, 3)
+	INSERT INTO SucursalCentroCosto (EntityId, RecordId) VALUES (3, 1)
+	INSERT INTO SucursalCentroCosto (EntityId, RecordId) VALUES (3, 2)
+	INSERT INTO SucursalCentroCosto (EntityId, RecordId) VALUES (3, 3)
 
 
 --- ROL POR USUARIO
@@ -260,9 +276,15 @@ SELECT * FROM PermiRole
 ----- PERMISOS A CENTROS DE COSTOS PARA AUDITORES
 SELECT * FROM PermiRoleRecord 
 
-	INSERT INTO PermiRoleRecord (PermiRoleRecordId, RoleId, EntityId, RecordId, PermissionId)VALUES (1, 7, 2, 201, 2);
-	INSERT INTO PermiRoleRecord (PermiRoleRecordId, RoleId, EntityId, RecordId, PermissionId)VALUES (2, 7, 2, 202, 2);
-	INSERT INTO PermiRoleRecord (PermiRoleRecordId, RoleId, EntityId, RecordId, PermissionId)VALUES (3, 7, 2, 203, 2);
+	INSERT INTO PermiRoleRecord (PermiRoleRecordId, RoleId, EntityId, RecordId, PermissionId) VALUES (1, 7, 1, 1, 2)
+	INSERT INTO PermiRoleRecord (PermiRoleRecordId, RoleId, EntityId, RecordId, PermissionId) VALUES (2, 7, 1, 2, 2)
+	INSERT INTO PermiRoleRecord (PermiRoleRecordId, RoleId, EntityId, RecordId, PermissionId) VALUES (3, 7, 1, 3, 2)
+	INSERT INTO PermiRoleRecord (PermiRoleRecordId, RoleId, EntityId, RecordId, PermissionId) VALUES (4, 7, 2, 1, 2)
+	INSERT INTO PermiRoleRecord (PermiRoleRecordId, RoleId, EntityId, RecordId, PermissionId) VALUES (5, 7, 2, 2, 2)
+	INSERT INTO PermiRoleRecord (PermiRoleRecordId, RoleId, EntityId, RecordId, PermissionId) VALUES (6, 7, 2, 3, 2)
+	INSERT INTO PermiRoleRecord (PermiRoleRecordId, RoleId, EntityId, RecordId, PermissionId) VALUES (7, 7, 3, 1, 2)
+	INSERT INTO PermiRoleRecord (PermiRoleRecordId, RoleId, EntityId, RecordId, PermissionId) VALUES (8, 7, 3, 2, 2)
+	INSERT INTO PermiRoleRecord (PermiRoleRecordId, RoleId, EntityId, RecordId, PermissionId) VALUES (9, 7, 3, 3, 2)
 
 
 ----- PERMISOS PARA USUARIOS EN SUCURSALES
@@ -381,100 +403,73 @@ SELECT * FROM PermiUserRecord
 	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId)VALUES (90, 23, 1, 103, 2);
 
 	---- AUDITORES EN SUCURSALES
-	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId)VALUES (91, 4, 2, 201, 2);
-	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId)VALUES (92, 4, 2, 202, 2);
-	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId)VALUES (93, 4, 2, 203, 2);	
-	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId)VALUES (94, 9, 2, 201, 2);
-	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId)VALUES (95, 9, 2, 202, 2);
-	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId)VALUES (96, 9, 2, 203, 2);
-	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId)VALUES (97, 16, 2, 201, 2);
-	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId)VALUES (98, 16, 2, 202, 2);
-	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId)VALUES (99, 16, 2, 203, 2);
+	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId) VALUES (91, 4, 1, 1, 2);
+	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId) VALUES (92, 4, 1, 2, 2);
+	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId) VALUES (93, 4, 1, 3, 2);
+	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId) VALUES (94, 9, 2, 1, 2);
+	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId) VALUES (95, 9, 2, 2, 2);
+	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId) VALUES (96, 9, 2, 3, 2);
+	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId) VALUES (97, 16, 3, 1, 2);
+	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId) VALUES (98, 16, 3, 2, 2);
+	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId) VALUES (99, 16, 3, 3, 2);
+	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId) VALUES (100, 4, 2, 1, 2);
+	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId) VALUES (101, 4, 2, 2, 2);
+	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId) VALUES (102, 4, 2, 3, 2);
+	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId) VALUES (103, 9, 1, 1, 2);
+	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId) VALUES (104, 9, 1, 2, 2);
+	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId) VALUES (105, 9, 1, 3, 2);
+	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId) VALUES (106, 9, 3, 1, 2);
+	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId) VALUES (107, 9, 3, 2, 2);
+	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId) VALUES (108, 9, 3, 3, 2);
+	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId) VALUES (109, 16, 1, 1, 2);
+	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId) VALUES (110, 16, 1, 2, 2);
+	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId) VALUES (111, 16, 1, 3, 2);
+	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId) VALUES (112, 16, 2, 1, 2);
+	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId) VALUES (113, 16, 2, 2, 2);
+	INSERT INTO PermiUserRecord (PermiUserRecordId, UserId, EntityId, RecordId, PermissionId) VALUES (114, 16, 2, 3, 3);
+
 	
 
 	-----------------------------------  QUERYS  ----------------------------------------------------  
 
-exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 3  -- Ejecutivo Comercial con Privilegios
-exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 8  -- Ejecutivo Comercial con Privilegios
-exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 19 -- Ejecutivo Comercial con Privilegios
-exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 5  -- Asesor Comercial con privilegios
-exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 10 -- Asesor Comercial con privilegios
-exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 21 -- Asesor Comercial con privilegios
-exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 6  -- Cajero con privilegios
-exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 11 -- Cajero con privilegios
-exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 15 -- Cajero con privilegios
+	exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 3  -- Ejecutivo Comercial con Privilegios
+	exec sp_ObtenerPermisosUsuarios @EntityId = 2, @UserId = 8  -- Ejecutivo Comercial con Privilegios
+	exec sp_ObtenerPermisosUsuarios @EntityId = 3, @UserId = 19 -- Ejecutivo Comercial con Privilegios
 
-exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 25 -- Asesor Comercial Supernumerario varias sucursales 
-exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 31 -- Cajero Supernumerario varias sucursales
+	exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 10 -- Asesor Comercial con privilegios
+	exec sp_ObtenerPermisosUsuarios @EntityId = 2, @UserId = 5  -- Asesor Comercial con privilegios
+	exec sp_ObtenerPermisosUsuarios @EntityId = 3, @UserId = 21 -- Asesor Comercial con privilegios
 
-exec sp_ObtenerPermisosUsuarios @EntityId = 2, @UserId = 4 --  Auditores Centros de Costos
-exec sp_ObtenerPermisosUsuarios @EntityId = 2, @UserId = 9 --  Auditores Centros de Costos
-exec sp_ObtenerPermisosUsuarios @EntityId = 2, @UserId = 16 -- Auditores Centros de Costos
+	exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 11 -- Cajero con privilegios
+	exec sp_ObtenerPermisosUsuarios @EntityId = 2, @UserId = 15 -- Cajero con privilegios
+	exec sp_ObtenerPermisosUsuarios @EntityId = 3, @UserId = 6  -- Cajero con privilegios
+		
+	exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 25 -- Asesor ComercialSupernumerario varias sucursales
+	exec sp_ObtenerPermisosUsuarios @EntityId = 2, @UserId = 25 -- Asesor ComercialSupernumerario varias sucursales 
+	exec sp_ObtenerPermisosUsuarios @EntityId = 3, @UserId = 25 -- Asesor ComercialSupernumerario varias sucursales 
+	
+	exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 31 -- Cajero Supernumerario varias sucursales
+	exec sp_ObtenerPermisosUsuarios @EntityId = 2, @UserId = 31 -- Cajero Supernumerario varias sucursales
+	exec sp_ObtenerPermisosUsuarios @EntityId = 3, @UserId = 31 -- Cajero Supernumerario varias sucursales
 
-SELECT * FROM [User] 
-SELECT * FROM [Role]
-SELECT * FROM UserRole
-SELECT * FROM PermiUser
-SELECT * FROM PermiRole
-SELECT * FROM PermiUserRecord
-SELECT * FROM PermiRoleRecord
-SELECT * FROM Entity
-SELECT * FROM Record
-select * from Permission
+	exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 4 -- Auditores Centros de Costos
+	exec sp_ObtenerPermisosUsuarios @EntityId = 2, @UserId = 4 -- Auditores Centros de Costos
+	exec sp_ObtenerPermisosUsuarios @EntityId = 3, @UserId = 4 -- Auditores Centros de Costos
+	exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 9 -- Auditores Centros de Costos
+	exec sp_ObtenerPermisosUsuarios @EntityId = 2, @UserId = 9 -- Auditores Centros de Costos
+	exec sp_ObtenerPermisosUsuarios @EntityId = 3, @UserId = 9 -- Auditores Centros de Costos
+	exec sp_ObtenerPermisosUsuarios @EntityId = 1, @UserId = 16 -- Auditores Centros de Costos
+	exec sp_ObtenerPermisosUsuarios @EntityId = 2, @UserId = 16 -- Auditores Centros de Costos
+	exec sp_ObtenerPermisosUsuarios @EntityId = 3, @UserId = 16 -- Auditores Centros de Costos
 
----Tabla User � Representa a los empleados del banco
-SELECT * FROM [User]
-
---- Tabla Role � Representa roles dentro del banco
-SELECT * FROM [Role]
-
---- Tabla Entity � Representa entidades como Sucursales o Centros de Costos
-SELECT * FROM Entity
-
---- Tabla Record � Registros espec�ficos de cada entidad, como sucursales o centros de costos espec�ficos
-SELECT * FROM Record
-
----Tabla UserRole --- Registro de Roles por usuario
-SELECT UserName,RoleName
-FROM UserRole UR
-JOIN [User] U ON U.UserId = UR.UserId
-JOIN [Role] R ON R.RoleId = UR.RoleId
-
---- Tabla Permission � Definici�n de permisos b�sicos en el sistema
-SELECT * FROM Permission
-
---- Tabla PermiRole � Permisos asignados a roles, aplicando a cualquier usuario con ese rol
-SELECT  R.RoleName,P.PermissionName  
-FROM PermiRole PR
-JOIN [Role] R ON R.RoleId = PR.RoleId
-JOIN Permission P ON P.PermissionId = PR.PermissionId
-
---- Tabla PermiUser � Permisos asignados directamente a usuarios
-SELECT PU.PermiUserId,U.UserName,R.RoleName,P.PermissionName
-FROM PermiUser PU
-JOIN [User] U ON U.UserId = PU.UserId
-JOIN Permission P ON P.PermissionId = PU.PermissionId
-JOIN UserRole UR ON UR.UserId = U.UserId
-JOIN [Role] R ON UR.RoleId = R.RoleId
-
---- Tabla PermiRoleRecord � Permisos espec�ficos asignados a un rol sobre un registro particular
-SELECT U.UserName,R.RoleName,E.EntityName,RE.RecordName,P.PermissionName
-FROM PermiRoleRecord PRR
-JOIN UserRole UR ON UR.RoleId = PRR.RoleId
-JOIN [ROLE] R ON R.RoleId = UR.RoleId
-join [User] U ON U.UserId = UR.UserId
-JOIN Entity E ON E.EntityId = PRR.EntityId
-JOIN Record RE ON RE.RecordId = PRR.RecordId
-JOIN Permission P ON P.PermissionId = PRR.PermissionId
-
---- Tabla PermiUserRecord � permisos de usuarios en sucursales
-SELECT U.UserName,R.RoleName,E.EntityName,RE.RecordName,P.PermissionName
-FROM PermiUserRecord PUR
-JOIN UserRole UR ON UR.UserId = PUR.UserId
-JOIN [ROLE] R ON R.RoleId = UR.RoleId
-join [User] U ON U.UserId = UR.UserId
-JOIN Entity E ON E.EntityId = PUR.EntityId
-JOIN Record RE ON RE.RecordId = PUR.RecordId
-JOIN Permission P ON P.PermissionId = PUR.PermissionId
-order by 4 desc
-
+	SELECT * FROM [User] 
+	SELECT * FROM [Role]
+	SELECT * FROM UserRole
+	SELECT * FROM PermiUser
+	SELECT * FROM PermiRole
+	SELECT * FROM PermiUserRecord
+	SELECT * FROM PermiRoleRecord
+	select * from Permission
+	SELECT * FROM Sucursal
+	SELECT * FROM CentroCosto
+	SELECT * from SucursalCentroCosto
